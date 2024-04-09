@@ -1,4 +1,5 @@
 # libraries go here
+import pandas
 
 
 # functions go here
@@ -48,8 +49,50 @@ def num_check(question, error, num_type):
         except ValueError:
             print(error)
 
-# lists for ingredients
 
+# currency formatting function
+def currency(x):
+    return "${:.2f}".format(x)
+
+
+# string checker [also works for yes/no]
+def string_checker(question, valid_responses, error):
+    while True:
+        response = input(question).lower()
+
+        for item in valid_responses:
+            if response == item:
+                return item
+
+        print(error)
+
+
+# identifies and returns ingredients weight
+def weight_question(question):
+    while True:
+        response = num_check(question, "Must be a number more than 0", float)
+        weight = string_checker("which unit is this ingredient measured in? [g, ml, kg, l, or individual] ",
+                                weight_list, "please enter a valid answer [g, ml, kg, l, or individual] ").lower()
+        for item in weight_list:
+            if weight == item:
+                return response, weight
+
+
+# set up blank dictionaries
+ingredient_list = []
+amount_needed = []
+amount_have = []
+ingredient_cost = []
+
+ingredient_dict = {
+    "ingredient": ingredient_list,
+    "need for recipe": amount_needed,
+    "have on hand": amount_have,
+    "cost": ingredient_cost
+}
+
+yn_list = ["yes", "no", "y", "n"]
+weight_list = ["g", "l", "ml", "kg", "individual"]
 
 # Main routine goes here
 # asks if user wants instructions
@@ -60,12 +103,47 @@ if want_instructions == "yes":
     print()
 
 # gets the name of the recipe
-recipe_name = not_blank("What is the name of your recipe?",
+recipe_name = not_blank("What is the name of your recipe? ",
                         "the recipe name cannot be blank")
 
 # gets the serving size
-serving_size = num_check("What is the serving size of this recipe?"
-                         "The serving size must be an integer that's more than 0",
-                         int)
+serving_size = num_check("What is the serving size of this recipe? ", "The serving size must be an integer"
+                         " that's more than 0 ", int)
 
+# loop to get ingredient name, amount needed, amount have and ingredient cost
+item_name = " "
+while item_name.lower() != "xxx":
+    print()
+    # get name, quantity and item
+    # get ingredients name, amount needed and have and ingredient cost
+    # print inbetween for nicer reading
+    ingredient_name = not_blank("Ingredient name: ", "")
+    print()
 
+    if ingredient_name.lower() == "xxx":
+        break
+
+    needed = weight_question("How much of the ingredient does the recipe call for? ")
+    print()
+
+    have = weight_question("How much of the ingredient do you currently have on hand? ")
+    print()
+
+    cost = num_check("How much did the ingredient on hand cost? ", "Must be a number more than 0", float)
+    print()
+
+    # append responses into list
+    ingredient_list.append(ingredient_name)
+    amount_needed.append(needed)
+    amount_have.append(have)
+    ingredient_cost.append(cost)
+
+ingredient_frame = pandas.DataFrame(ingredient_dict)
+ingredient_frame = ingredient_frame.set_index('ingredient')
+
+# applying the currency to the cost
+ingredient_frame['cost'] = ingredient_frame['cost'].apply(currency)
+
+# * * * Printing area * * *
+print(ingredient_frame)
+print()

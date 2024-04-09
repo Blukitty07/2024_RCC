@@ -52,6 +52,7 @@ def string_checker(question, valid_responses, error):
         print(error)
 
 
+# identifies and returns ingredients weight
 def weight_question(question):
     while True:
         response = num_check(question, "Must be a number more than 0", float)
@@ -62,19 +63,13 @@ def weight_question(question):
                 return response, weight
 
 
-# get the given number
-# finds out which weight measurement [g/ml/individual]
-
-
 # set up blank dictionaries
 ingredient_list = []
 amount_needed = []
 amount_have = []
 ingredient_cost = []
 
-# to do. . .
-# get currency to work properly
-# figure out how to add weights onto the end
+
 ingredient_dict = {
     "ingredient": ingredient_list,
     "need for recipe": amount_needed,
@@ -84,7 +79,6 @@ ingredient_dict = {
 
 yn_list = ["yes", "no", "y", "n"]
 weight_list = ["g", "l", "ml", "kg", "individual"]
-
 
 # loop to get ingredient name, amount needed, amount have and ingredient cost
 item_name = " "
