@@ -16,14 +16,18 @@ test_dict = {
     "Multiplication Answers": times_answers
 }
 
-bird = 4
-spiders = 12
+egg_needed = 4
+egg_on_hand = 10
+egg_cost = 8
 
 # Main code
+# stand in answers
 Answer_1 = (1 / 8)
 Answer_2 = (Answer_1 * 4)
-Answer_3 = (spiders / bird)
-Answer_4 = (bird * spiders)
+Answer_4 = (3 * 3)
+
+# egg test
+Answer_3 = ((egg_cost / egg_on_hand) * egg_needed)
 
 # add the answers into the respective lists
 divide_answers.append(Answer_1)
