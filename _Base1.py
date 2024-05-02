@@ -78,6 +78,11 @@ def weight_question(question):
                 return response, weight
 
 
+# round numbers up to two dp
+def two_decimals(x):
+    return "{:.2f}".format(x)
+
+
 # set up blank dictionaries
 ingredient_list = []
 amount_needed = []
@@ -85,10 +90,10 @@ amount_have = []
 ingredient_cost = []
 
 ingredient_dict = {
-    "ingredient": ingredient_list,
-    "need for recipe": amount_needed,
-    "have on hand": amount_have,
-    "cost": ingredient_cost
+    "Ingredient Name": ingredient_list,
+    "Ingredients needed": amount_needed,
+    "Ingredients on hand": amount_have,
+    "Cost of ingredient": ingredient_cost
 }
 
 yn_list = ["yes", "no", "y", "n"]
@@ -101,6 +106,7 @@ if want_instructions == "yes":
     print("instructions go here")
     print("program continues...")
     print()
+
 
 # gets the name of the recipe
 recipe_name = not_blank("What is the name of your recipe? ",
@@ -139,11 +145,27 @@ while item_name.lower() != "xxx":
     ingredient_cost.append(cost)
 
 ingredient_frame = pandas.DataFrame(ingredient_dict)
-ingredient_frame = ingredient_frame.set_index('ingredient')
+# ingredient_frame = ingredient_frame.set_index('Ingredient Name')
+
+
+# calculating the cost of each ingredient in regard to the recipe
+ingredient_frame['Cost to make'] = ingredient_frame['Cost of ingredient'] / ingredient_frame['Ingredients on hand']\
+                                   * ingredient_frame['Ingredients needed']
+
+
+# calculate total cost
+total_cost = ingredient_frame['Cost to make'].sum()
+
+# calculate cost per serving
+total_cost_per_serve = total_cost/serving_size
+
 
 # applying the currency to the cost
-ingredient_frame['cost'] = ingredient_frame['cost'].apply(currency)
+ingredient_frame['Cost of ingredient'] = ingredient_frame['Cost of ingredient'].apply(currency)
 
 # * * * Printing area * * *
+print("Recipe name:", recipe_name)
+print("Serving size:", serving_size)
 print(ingredient_frame)
-print()
+print("Total Cost:", currency(total_cost))
+print("Cost per serving:", currency(total_cost_per_serve))
