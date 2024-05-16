@@ -36,6 +36,9 @@ while item_name.lower() != "xxx":
     answer1 = input("How much do you need? ").lower()
     if answer1 == "xxx":
         break
+    if answer1[0] == "-":
+        print("Pleas enter a number more than 0")
+        continue
 
     # Extract amount and unit using extract_amount_unit function
     amount, unit = extract_amount_unit(answer1)
@@ -45,8 +48,8 @@ while item_name.lower() != "xxx":
         if unit in weight_list:
             print("yay")
             if unit in ['kg', 'kilograms'] or unit in ['l', 'liters']:
-                unit = amount * 1000
-                group1.append(unit)
+                digit = amount * 1000
+                group1.append(digit)
                 if unit in ['kg', 'kilograms']:
                     group2.append("g")
                 if unit in ['l', 'liters']:
@@ -60,6 +63,7 @@ while item_name.lower() != "xxx":
         weight1 = input("What measurement is this in? ").lower()
         if weight1 in weight_list:
             print("yay")
+            amount = answer1
             if weight1 in ['kg', 'kilograms'] or weight1 in ['l', 'liters']:
                 unit = float(amount) * 1000
                 group1.append(unit)
@@ -67,11 +71,17 @@ while item_name.lower() != "xxx":
                     group2.append("g")
                 if weight1 in ['l', 'liters']:
                     group2.append("ml")
+                else:
+                    group2.append(weight1)
             else:
                 group1.append(amount)
                 group2.append(weight1)
         else:
             print("Invalid Input")
+
+# debugging
+print(Test_dict)
+
 
 # Construct DataFrame after the loop
 test_frame = pandas.DataFrame(Test_dict)

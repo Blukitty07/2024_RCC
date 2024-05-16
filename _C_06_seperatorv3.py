@@ -48,7 +48,7 @@ while item_name.lower() != "xxx":
     # Extract amount and unit using extract_amount_unit function
     amount, unit = separate_amount_unit(answer1)
     if amount is not None and unit is not None:
-        if amount is not None and float(amount) > 0:  # Check if the amount is not negative
+        if amount is not None and float(amount) >= 0:  # Check if the amount is not negative
             print("Amount:", amount)
             print("Unit:", unit)
             if unit in weight_list:
