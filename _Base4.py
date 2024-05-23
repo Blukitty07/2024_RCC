@@ -1,8 +1,6 @@
 # to do
-# write instructions
-# ask ms what the slide means
-# boundary test
-# finish up slide
+# Proper test
+# finish up the slides
 
 
 # libraries go here
@@ -104,7 +102,8 @@ def check1(question, append_to, second_append, error):
     while True:
         user_input = input(question)
         if user_input[0] == "-":
-            print("Please enter a number more than 0")
+            print("Please enter a valid number, that is more than 0.")
+            continue
         amount, unit = extract_amount_unit(user_input)
         if amount is not None and unit is not None:
             if unit in weight_list:
@@ -126,7 +125,9 @@ def check1(question, append_to, second_append, error):
                 print(error)
 
         else:
-            check2(user_input, append_to, second_append, error)
+            check2(user_input, append_to, second_append, "Please enter a valid weight [list of accepted weights "
+                                                         "'grams', 'kilograms', 'milliliters', 'liters', "
+                                                         "'individual', 'pieces'")
             break
 
     # carries on from check1 making sure that a valid weight gets inputted
@@ -135,6 +136,14 @@ def check1(question, append_to, second_append, error):
 # carries on from check1 making sure that a valid weight gets inputted
 def check2(user_input, append_to, second_append, error):
     while True:
+        try:
+            user_input = int(user_input)
+            if user_input <= 0:
+                print("Please enter a valid number, that is more than 0.")
+                continue
+        except ValueError:
+            user_input = input("Please enter a valid number, that is more than 0. ")
+            continue
         weight1 = input("What measurement is this in? ").lower()
         if weight1 in weight_list:
             if weight1 in ['kg', 'kilograms'] or weight1 in ['l', 'liters']:
@@ -182,7 +191,15 @@ weight_list = ['grams', 'g', 'kg', 'kilograms', 'milliliters', 'ml', 'liters', '
 # asks if user wants instructions
 want_instructions = yes_no("Do you want to read the instructions? ").lower()
 if want_instructions == "yes":
-    print("instructions go here")
+    print()
+    print("This is a Recipe Cost Calculator.")
+    print("In this you will be asked you recipes name, serving size and ingredients.")
+    print("You'll be asked for your ingredients name, the amount the recipe needs, the amount that you have on hand, "
+          "and the cost of the ingredient.")
+    print("To stop inputting more ingredients you can enter 'xxx' when it asks for the ingredients name.")
+    print("It'll then print out both on here and on a file [titled the name of the recipe]")
+    print("the recipes name, serving size, ingredients [names, amounts needed and on hand and the cost], the amount of")
+    print("ingredients used in this recipe and the total cost of the recipe and the cost per serving.")
     print()
 
 # gets the name of the recipe
@@ -200,19 +217,24 @@ while item_name.lower() != "xxx":
     # get name, quantity and item
     # get ingredients name, amount needed and have and ingredient cost
     # print inbetween for nicer reading
+    print("Respond with 'xxx' to stop inputting ingredients")
     ingredient_name = not_blank("Ingredient name: ", "")
     print()
 
     if ingredient_name.lower() == "xxx":
         break
 
-# need amount
-    check1("How much do you need? ", amount_needed, need_numbers, "This is an Invalid Input please retry")
+# Asking for the need amount [error message only asks for number to make it easy to read and less confusing,
+    # but will accept a number and valid weight
+    check1("How much do you need? ", amount_needed, need_numbers, "This is an Invalid Input, please enter a valid "
+                                                                  "number")
     print()
 
 
-# have amount
-    check1("How much did you buy / do you have on hand? ", amount_have, have_numbers, "This is an Invalid Input please retry")
+# Asking for the have amount [error message only asks for number to make it easy to read and less confusing,
+    # but will accept a number and valid weight
+    check1("How much did you buy / do you have on hand? ", amount_have, have_numbers, "This is an Invalid Input "
+                                                                                      "please enter a valid number")
     print()
 
     cost = num_check("How much did the ingredient on hand cost? ", "Must be a number more than 0", float)
@@ -226,17 +248,17 @@ ingredient_frame = pandas.DataFrame(ingredient_dict)
 numbers_frame = pandas.DataFrame(number_dict)
 
 
-# Ensure the cost column is numeric
+# Ensures that  the cost column is numeric
 ingredient_frame['Cost of ingredient'] = pandas.to_numeric(ingredient_frame['Cost of ingredient'])
 
-# Ensure the numbers are numeric
+# Ensures that the numbers are numeric
 numbers_frame['Numbers for Needed'] = pandas.to_numeric(numbers_frame['Numbers for Needed'])
 numbers_frame['Numbers for Have'] = pandas.to_numeric(numbers_frame['Numbers for Have'])
 
 
 # calculating the cost of each ingredient in regard to the recipe
-ingredient_frame['Cost to make'] = (ingredient_frame['Cost of ingredient'] / numbers_frame['Numbers for Needed']) \
-                                   * numbers_frame['Numbers for Have']
+ingredient_frame['Cost to make'] = (ingredient_frame['Cost of ingredient'] / numbers_frame['Numbers for Have']) \
+                                   * numbers_frame['Numbers for Needed']
 
 
 # calculate total cost
@@ -248,8 +270,8 @@ total_cost_per_serve = total_cost / serving_size
 # applying the currency to the cost
 ingredient_frame['Cost of ingredient'] = ingredient_frame['Cost of ingredient'].apply(currency)
 ingredient_frame['Cost to make'] = ingredient_frame['Cost to make'].apply(currency)
-ingredient_frame[total_cost] = ingredient_frame[total_cost].apply(currency)
-ingredient_frame[total_cost_per_serve] = ingredient_frame[total_cost_per_serve].apply(currency)
+total_cost = currency(total_cost)
+total_cost_per_serve = currency(total_cost_per_serve)
 
 # strings for printing / exporting set up area
 Heading_string = f"* * * * Recipe Cost Calculator {recipe_name} * * * *"
@@ -259,7 +281,7 @@ serving_string = f"Serving size: {serving_size}"
 ingredient_txt = pandas.DataFrame.to_string(ingredient_frame)
 
 
-total_string = f"Total cost: ${total_cost:.2f}"
+total_string = f"Total cost: {total_cost}"
 cost_per_serve_string = f"Cost per serving: {total_cost_per_serve}"
 
 # Set pandas options to display all columns
