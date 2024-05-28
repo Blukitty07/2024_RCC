@@ -1,8 +1,3 @@
-# to do
-# Proper test
-# finish up the slides
-
-
 # libraries go here
 import pandas
 import re
@@ -56,7 +51,7 @@ def num_check(question, error, num_type):
             print(error)
 
 
-# currency formatting function
+# currency formatting
 def currency(x):
     return "${:.2f}".format(x)
 
@@ -81,7 +76,7 @@ def currency(x):
 
 # from chat gpt, extracts answers from a input string after every number
 
-# separates an input after every number
+
 def extract_amount_unit(input_str):
     # Define regular expression patterns for number and unit
     pattern = r'(\d+(\.\d+)?)\s*(\D+)'
@@ -94,6 +89,7 @@ def extract_amount_unit(input_str):
         return amount, unit
     else:
         return None, None
+# [above] separates an input after every number
 
 
 # figure out how to input for each question
@@ -165,7 +161,7 @@ def check2(user_input, append_to, second_append, error):
             continue
 
 
-# set up blank dictionaries
+# set up blank dictionaries and lists
 ingredient_list = []
 amount_needed = []
 amount_have = []
@@ -185,6 +181,7 @@ number_dict = {
     "Numbers for Have": have_numbers
 }
 
+# list of valid weights
 weight_list = ['grams', 'g', 'kg', 'kilograms', 'milliliters', 'ml', 'liters', 'l', 'individual', 'pieces', 'piece']
 
 # Main routine goes here
@@ -206,11 +203,11 @@ if want_instructions == "yes":
 recipe_name = not_blank("What is the name of your recipe? ",
                         "the recipe name cannot be blank")
 
-# gets the serving size
+# gets the serving size of the recipe
 serving_size = num_check("What is the serving size of this recipe? ", "The serving size must be an integer"
                                                                       " that's more than 0 ", int)
 
-# loop to get ingredient name, amount needed, amount have and ingredient cost
+# loop to get ingredients name, amount needed for recipe, amount the user has on hand and ingredient cost
 item_name = " "
 while item_name.lower() != "xxx":
     print()
@@ -240,18 +237,19 @@ while item_name.lower() != "xxx":
     cost = num_check("How much did the ingredient on hand cost? ", "Must be a number more than 0", float)
     print()
 
-    # append responses into list
+    # append responses not already append into list
     ingredient_list.append(ingredient_name)
     ingredient_cost.append(cost)
 
+# make the panda frames
 ingredient_frame = pandas.DataFrame(ingredient_dict)
 numbers_frame = pandas.DataFrame(number_dict)
 
 
-# Ensures that  the cost column is numeric
+# Ensures that the cost column is numeric for equations
 ingredient_frame['Cost of ingredient'] = pandas.to_numeric(ingredient_frame['Cost of ingredient'])
 
-# Ensures that the numbers are numeric
+# Ensures that the numbers are numeric for equations
 numbers_frame['Numbers for Needed'] = pandas.to_numeric(numbers_frame['Numbers for Needed'])
 numbers_frame['Numbers for Have'] = pandas.to_numeric(numbers_frame['Numbers for Have'])
 
@@ -267,11 +265,14 @@ total_cost = ingredient_frame['Cost to make'].sum()
 # calculate cost per serving
 total_cost_per_serve = total_cost / serving_size
 
-# applying the currency to the cost
+# applying the currency to the costs
 ingredient_frame['Cost of ingredient'] = ingredient_frame['Cost of ingredient'].apply(currency)
 ingredient_frame['Cost to make'] = ingredient_frame['Cost to make'].apply(currency)
 total_cost = currency(total_cost)
 total_cost_per_serve = currency(total_cost_per_serve)
+
+# set index at end (before printing)
+ingredient_frame = ingredient_frame.set_index('Ingredient Name')
 
 # strings for printing / exporting set up area
 Heading_string = f"* * * * Recipe Cost Calculator {recipe_name} * * * *"
@@ -292,17 +293,16 @@ to_write = [Heading_string, recipe_name_string, serving_string, ingredient_txt, 
 
 # * * * Printing area * * *
 # write output to file
-# create file to hold data (add .txt extension)
+# create file to hold data
 file_name = f"{recipe_name} .txt"
 text_file = open(file_name, "w+")
 
-# heading
-# print output
+# printing output for the file
 for item in to_write:
     text_file.write(item)
     text_file.write("\n\n")
 
-# close file
+# close the file
 text_file.close()
 
 # Print stuff
